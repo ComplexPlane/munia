@@ -35,35 +35,25 @@ namespace MUNIA.Skinning {
 		protected ControllerState State;
 
         private bool PrevSplitButtonState = false;
+        IntPtr LivesplitHandle = IntPtr.Zero;
 
         public void HandleSplit() {
             if (State == null) return;
 
             var splitButtonState = State.Buttons[3];
-            if (splitButtonState != PrevSplitButtonState) {
-                if (splitButtonState) {
-                    // Send a series of key presses to the Calculator application.
-                    // Get a handle to the Calculator application. The window class
-                    // and window name were obtained using the Spy++ tool.
-                    IntPtr livesplitHandle = FindWindow(null, "LiveSplit");
+            if (splitButtonState == PrevSplitButtonState) return;
 
-                    // Verify that Calculator is a running process.
-                    if (livesplitHandle == IntPtr.Zero) {
-                        MessageBox.Show("Livesplit is not running.");
-                        return;
-                    }
+            PrevSplitButtonState = splitButtonState;
+            if (!splitButtonState) return;  // We only care about the down press
 
-                    // Make Calculator the foreground application and send it 
-                    // a set of calculations.
-                    SetForegroundWindow(livesplitHandle);
-                    SendKeys.Send("{F12}");
-                }
-
-                PrevSplitButtonState = splitButtonState;
+            IntPtr livesplitHandle = FindWindow(null, "LiveSplit");
+            if (livesplitHandle != IntPtr.Zero) {
+                SetForegroundWindow(livesplitHandle);
+                SendKeys.Send("{F12}");
             }
         }
 
-		public abstract void Activate();
+        public abstract void Activate();
 		public abstract void Deactivate();
 
 		public static Skin Clone(Skin skin) {
