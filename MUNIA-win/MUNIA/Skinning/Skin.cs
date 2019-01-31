@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using MUNIA.Controllers;
 
 namespace MUNIA.Skinning {
@@ -22,6 +23,20 @@ namespace MUNIA.Skinning {
 			State = state;
 		}
 		protected ControllerState State;
+
+        private bool PrevSplitButtonState = false;
+
+        public void HandleSplit() {
+            var splitButtonState = State.Buttons[3];
+            if (splitButtonState != PrevSplitButtonState) {
+                if (splitButtonState) {
+                    MessageBox.Show("split button pressed!");
+                } else {
+                    MessageBox.Show("split button released!");
+                }
+            }
+            PrevSplitButtonState = splitButtonState;
+        }
 
 		public abstract void Activate();
 		public abstract void Deactivate();

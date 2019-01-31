@@ -354,9 +354,10 @@ namespace MUNIA.Forms {
 			return ConfigManager.ActiveSkin.UpdateState(activeController);
 		}
 
-
 		private void Render() {
 			if (ConfigManager.ActiveSkin == null) return;
+
+            ConfigManager.ActiveSkin.HandleSplit();
 
 			glControl.MakeCurrent();
 			GL.ClearColor(Color.FromArgb(0, ConfigManager.BackgroundColor));
