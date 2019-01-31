@@ -1,11 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MUNIA.Controllers;
 
 namespace MUNIA.Skinning {
 
 	public abstract class Skin {
+        // Get a handle to an application window.
+        [DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        // Activate an application window.
+        [DllImport("USER32.DLL")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
 		public string Name { get; set; }
 		public string Path { get; set; }
 		public SkinLoadResult LoadResult { get; protected set; }
@@ -27,15 +37,30 @@ namespace MUNIA.Skinning {
         private bool PrevSplitButtonState = false;
 
         public void HandleSplit() {
+            if (State == null) return;
+
             var splitButtonState = State.Buttons[3];
             if (splitButtonState != PrevSplitButtonState) {
                 if (splitButtonState) {
-                    MessageBox.Show("split button pressed!");
-                } else {
-                    MessageBox.Show("split button released!");
+                    // Send a series of key presses to the Calculator application.
+                    // Get a handle to the Calculator application. The window class
+                    // and window name were obtained using the Spy++ tool.
+                    IntPtr livesplitHandle = FindWindow(null, "LiveSplit");
+
+                    // Verify that Calculator is a running process.
+                    if (livesplitHandle == IntPtr.Zero) {
+                        MessageBox.Show("Livesplit is not running.");
+                        return;
+                    }
+
+                    // Make Calculator the foreground application and send it 
+                    // a set of calculations.
+                    SetForegroundWindow(livesplitHandle);
+                    SendKeys.Send("{F12}");
                 }
+
+                PrevSplitButtonState = splitButtonState;
             }
-            PrevSplitButtonState = splitButtonState;
         }
 
 		public abstract void Activate();
